@@ -6,6 +6,9 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from pydub import AudioSegment
+from math import log2, pow
+from recordSound import record_sound as rec
+import os
 
 
 # showing the window
@@ -13,10 +16,10 @@ root = Tk()
 
 # Using 'stringvar' to update label
 v = StringVar()
-mjaw = Label(root, textvariable=v)
+mjaw = Label(root, textvariable=v, font=('', 50))
 mjaw.place(x=60, y=150)
 
-
+# loaded file inputted
 lbl1 = Label(root)
 lbl1.place(x=15, y=100)
 
@@ -25,18 +28,23 @@ lbl1.place(x=15, y=100)
 
 def start():
     x = lbl1['text']
+    # converting the record to mono! file
+
     if x == "":
         messagebox.showwarning("File Missing", "Open a file first.")
     else:
+        sound = AudioSegment.from_wav(x)
+        sound = sound.set_channels(1)
+        sound.export(x, format="wav")
         main(x)
 
-# stop the music and the visualization
 
-
+# record the music
 def record():
     # WE WILL WRITE SOME CONDITIONS HERE
-    import recordSound
-
+    rec()
+    lbl1.configure(text=os.path.dirname(
+        os.path.abspath(__file__)) + "/myRecord.wav")
     # Openfile dialog
 
 
@@ -48,7 +56,7 @@ def OpenFile():
                            )
     if not name:
         return name
-#Converting stere music to mono! 
+# Converting stere music to mono!
     sound = AudioSegment.from_wav(name)
     sound = sound.set_channels(1)
     sound.export(name, format="wav")
@@ -59,18 +67,41 @@ def OpenFile():
         lbl1.config(text="File not exist")
 
 
+# Imported images
+startimg = PhotoImage(file="img/but.png")
+openfileimg = PhotoImage(file="img/openfile.png")
+recordimg = PhotoImage(file="img/record.png")
 # Start the process Button
-startBtn = Button(root, text="Start", command=start)
+startBtn = Button(root, text="Start", image=startimg,
+                  width="80", height="20", command=start)
 startBtn.place(x=15, y=15)
 # Opening files Button
-openfileBtn = Button(root, text='Open file', command=OpenFile)
-openfileBtn.place(x=85, y=15)
+openfileBtn = Button(root, text='Open file',
+                     image=openfileimg, command=OpenFile)
+openfileBtn.place(x=15, y=45)
 # Stop Button
-stopBtn = Button(root, text="Record", command=record)
-stopBtn.place(x=160, y=15)
+recordBtn = Button(root, text="Record", image=recordimg, command=record)
+recordBtn.place(x=15, y=75)
+
+
+# The frequency
+A4 = 440
+C0 = A4 * pow(2, -4.75)
+name = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
 
 def matching_thefreq(thefreq):
+    # DISABLE BUTTONS WHILE SOMETHING HAPPENING
+    startBtn.config(state=DISABLED)
+    openfileBtn.config(state=DISABLED)
+    recordBtn.config(state=DISABLED)
+    h = round(12 * log2(thefreq / C0))
+    octave = h // 12
+    n = h % 12
+    return name[n] + str(octave)
+
+
+'''---> old frequency searcher --->def matching_thefreq(thefreq):
     note = ""
     if(thefreq > 15 and thefreq < 17.32):
         note = "C0"
@@ -260,14 +291,12 @@ def matching_thefreq(thefreq):
         return note
     elif(thefreq > 7458 and thefreq < 8000):
         note = "B8"
-        return note
+        return note'''
+
 
 # THE MAIN WIZARD WHO MAKING THE MAGIC (*_*)
-
-
 def main(sound):
     chunk = 2048
-
 
     # open up a wave
     wf = wave.open(sound, 'rb')
@@ -304,15 +333,23 @@ def main(sound):
             # print ("The freq is %f Hz." % (thefreq))                   #printing out the frequency
             v.set(str(matching_thefreq(thefreq)))
             lbl1.update()
-
+            
+            
+            
         else:
             thefreq = which * RATE / chunk
             # print ("The freq is %f Hz." % (thefreq))
-            print(thefreq)
+            v.set(str(matching_thefreq(thefreq)))
+            lbl1.update()
+
         # read some more data
         data = wf.readframes(chunk)
     if data:
         stream.write(data)
+        startBtn.config(state=NORMAL)
+        openfileBtn.config(state=NORMAL)
+        recordBtn.config(state=NORMAL)
+
     stream.close()
     p.terminate()
 
