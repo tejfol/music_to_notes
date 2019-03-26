@@ -9,25 +9,61 @@ from pydub import AudioSegment
 from math import log2, pow
 from recordSound import record_sound as rec
 import os
+import time
 
 
 # showing the window
 root = Tk()
 
+#Images to note showing
+noteA = PhotoImage(file="img/A.png")
+noteA_active = PhotoImage(file="img/A(active).png")
+noteA_lbl = Label(root, image = noteA)
+noteA_lbl.place(x=10, y=250)
+
+noteB = PhotoImage(file="img/B.png")
+noteB_active = PhotoImage(file="img/B(active).png")
+noteB_lbl = Label(root, image = noteB)
+noteB_lbl.place(x=160, y=250)
+
+noteC = PhotoImage(file="img/C.png")
+noteC_active = PhotoImage(file="img/C(active).png")
+noteC_lbl = Label(root, image = noteC)
+noteC_lbl.place(x=310, y=250)
+
+noteD = PhotoImage(file="img/D.png")
+noteD_active = PhotoImage(file="img/D(active).png")
+noteD_lbl = Label(root, image = noteD)
+noteD_lbl.place(x=460, y=250)
+
+noteE = PhotoImage(file="img/E.png")
+noteE_active = PhotoImage(file="img/E(active).png")
+noteE_lbl = Label(root, image = noteE)
+noteE_lbl.place(x=610, y=250)
+
+noteF = PhotoImage(file="img/F.png")
+noteF_active = PhotoImage(file="img/F(active).png")
+noteF_lbl = Label(root, image = noteF)
+noteF_lbl.place(x=760, y=250)
+
+noteG = PhotoImage(file="img/G.png")
+noteG_active = PhotoImage(file="img/G(active).png")
+noteG_lbl = Label(root, image = noteG)
+noteG_lbl.place(x=910, y=250)
+
 # Using 'stringvar' to update label
 v = StringVar()
-mjaw = Label(root, textvariable=v, font=('', 50))
-mjaw.place(x=60, y=150)
+frequencylbl = Label(root, textvariable=v, font=('', 50))
+frequencylbl.place(x=60, y=150)
 
 # loaded file inputted
-lbl1 = Label(root)
-lbl1.place(x=15, y=100)
+input_audio_file = Label(root)
+input_audio_file.place(x=15, y=100)
 
 # The start button
-
-
 def start():
-    x = lbl1['text']
+    
+    x = input_audio_file['text']
     # converting the record to mono! file
 
     if x == "":
@@ -37,13 +73,27 @@ def start():
         sound = sound.set_channels(1)
         sound.export(x, format="wav")
         main(x)
+        
+#remove the directory of the audio file what we choose or recorded
+def removeAudio():
+    if input_audio_file != "":
+        input_audio_file.config(text="")
+    else:
+        return
 
+#for menubar to quit the program
+def quit():
 
+    result = messagebox.askquestion('Quit','Are You Sure?', icon='warning')
+    if result == 'yes':
+        sys.exit()
+    else:
+        pass
 # record the music
 def record():
     # WE WILL WRITE SOME CONDITIONS HERE
     rec()
-    lbl1.configure(text=os.path.dirname(
+    input_audio_file.configure(text=os.path.dirname(
         os.path.abspath(__file__)) + "/myRecord.wav")
     # Openfile dialog
 
@@ -62,9 +112,9 @@ def OpenFile():
     sound.export(name, format="wav")
 # Using try in case user types in unknown file or closes without choosing a file.
     try:
-        lbl1.config(text=str(name))
+        input_audio_file.config(text=str(name))
     except:
-        lbl1.config(text="File not exist")
+        input_audio_file.config(text="File not exist")
 
 
 # Imported images
@@ -90,15 +140,17 @@ C0 = A4 * pow(2, -4.75)
 name = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
 
+
 def matching_thefreq(thefreq):
     # DISABLE BUTTONS WHILE SOMETHING HAPPENING
     startBtn.config(state=DISABLED)
     openfileBtn.config(state=DISABLED)
     recordBtn.config(state=DISABLED)
+    #found the ovtave
     h = round(12 * log2(thefreq / C0))
     octave = h // 12
     n = h % 12
-    return name[n] + str(octave)
+    return name[n] # + str(octave)
 
 
 '''---> old frequency searcher --->def matching_thefreq(thefreq):
@@ -292,7 +344,7 @@ def matching_thefreq(thefreq):
     elif(thefreq > 7458 and thefreq < 8000):
         note = "B8"
         return note'''
-
+mynotelist = []
 
 # THE MAIN WIZARD WHO MAKING THE MAGIC (*_*)
 def main(sound):
@@ -332,16 +384,55 @@ def main(sound):
             thefreq = (which + x1) * RATE / chunk
             # print ("The freq is %f Hz." % (thefreq))                   #printing out the frequency
             v.set(str(matching_thefreq(thefreq)))
-            lbl1.update()
-            
-            
+            input_audio_file.update()
+
+            def active(n):
+
+                if n == "A":
+                    mynotelist.append("A")
+                    noteA_lbl.config(image=noteA_active)
+                elif n != "A":
+                    noteA_lbl.config(image=noteA)
+                if n == "B":
+                    mynotelist.append("B")
+                    noteB_lbl.config(image=noteB_active)
+                if n != "B":
+                    noteB_lbl.config(image=noteB)
+                if n == "C":
+                    mynotelist.append("C")
+                    noteC_lbl.config(image=noteC_active)
+                if n != "C":
+                    noteC_lbl.config(image=noteC)
+                if n == "D":
+                    mynotelist.append("D")
+                    noteD_lbl.config(image=noteD_active)
+                if n != "D":
+                    noteD_lbl.config(image=noteD)
+                if n == "E":
+                    mynotelist.append("E")
+                    noteE_lbl.config(image=noteE_active)
+                if n != "E":
+                    noteE_lbl.config(image=noteE)
+                if n == "F":
+                    mynotelist.append("F")
+                    noteF_lbl.config(image=noteF_active)
+                if n != "F":
+                    noteF_lbl.config(image=noteF)
+                if n == "G":
+                    mynotelist.append("G")
+                    noteG_lbl.config(image=noteG_active)
+                if n != "G":
+                    noteG_lbl.config(image=noteG)           
+
+            active(matching_thefreq(thefreq))
+
             
         else:
             thefreq = which * RATE / chunk
             # print ("The freq is %f Hz." % (thefreq))
             v.set(str(matching_thefreq(thefreq)))
-            lbl1.update()
-
+            input_audio_file.update()
+        
         # read some more data
         data = wf.readframes(chunk)
     if data:
@@ -349,11 +440,24 @@ def main(sound):
         startBtn.config(state=NORMAL)
         openfileBtn.config(state=NORMAL)
         recordBtn.config(state=NORMAL)
-
+    print(mynotelist)    
     stream.close()
     p.terminate()
 
 
+menubar = Menu(root)
+mymenu = Menu(root)
+root.config(menu=mymenu)
+
+submenu = Menu(mymenu)
+
+mymenu.add_cascade(label="File", menu=submenu)
+
+submenu.add_command(label="Remove audio", command=removeAudio)
+submenu.add_command(label="Save")
+submenu.add_command(label="Quit", command = quit)
+
+#Main loop for the programm
 root.geometry("720x480")
 root.title("Welcome")
 root.mainloop()
