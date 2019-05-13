@@ -1,0 +1,12 @@
+\header{
+title = "ewq"
+}
+\relative c'' {
+\key a \major
+\tempo 4/2
+fis4 a4 fis4 
+}
+\addlyrics {
+eqweqw
+}
+\version "2.19.55" % necessary for upgrading to future LilyPond versions.
